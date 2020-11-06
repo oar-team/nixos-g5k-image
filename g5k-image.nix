@@ -21,6 +21,7 @@
     case $o in
             root=*)
                 set -- $(IFS==; echo $o)
+                waitDevice $2
                 e2label $2 nixos
                 ;;
         esac
@@ -102,7 +103,8 @@
     touch /etc/NIXOS
     ${config.nix.package.out}/bin/nix-env -p /nix/var/nix/profiles/system --set /run/current-system
   '';
-  
+
+  networking.hostName = "";
     #formatAttr = "g5k-image";
     formatAttr = "g5k-image-info";
   filename = "*.img";
