@@ -1,29 +1,33 @@
 { config, lib, pkgs, modulesPath, ... }:
 let
-  kaenv_name = if (builtins.getEnv ("KAENV_NAME") != "") then
-    builtins.getEnv ("KAENV_NAME")
+  image_name = if (builtins.getEnv ("KAENV_NAME") != "") then
+  builtins.getEnv ("KAENV_NAME")
   else
-    "nixos-${pkgs.stdenv.hostPlatform.system}";
+  "nixos-${pkgs.stdenv.hostPlatform.system}";
 
   author = if (builtins.getEnv ("AUTHOR") != "") then
     builtins.getEnv ("AUTHOR")
   else
-    builtins.getEnv ("USER");
+  builtins.getEnv ("USER");
 
-  image_name = kaenv_name;
-
-  # image_file = if (builtins.getEnv("YOP") != "") then 
-  # builtins.getEnv("YOP")
-  # else "hello";
-
-  postinstall = if (builtins.getEnv ("POST_INSTALL") != "") then
-    builtins.getEnv ("POST_INSTALL")
+ file_image_baseurl = if (builtins.getEnv ("FILE_IMAGE_BASEURL") != "") then
+    builtins.getEnv ("FILE_IMAGE_BASEURL")
   else
-    "http://public.nancy.grid5000.fr/~orichard/postinstalls/g5k-nixos-postinstall-2020110500.tgz";
+    "file:~";
+
+ postinstall = if (builtins.getEnv ("POST_INSTALL") != "") then
+  builtins.getEnv ("POST_INSTALL")
+  else
+  "http://public.nancy.grid5000.fr/~orichard/postinstalls/g5k-nixos-postinstall-2020111201.tgz";
+
+ postinstall_args = if (builtins.getEnv ("POST_INSTALL") != "") then
+   builtins.getEnv ("POST_INSTALL_ARGS")
+   else
+   "g5k-postinstall --net none --disable-install-grub2";
+   
 in {
 
   imports =
-
     [
       # Profiles of this basic installation.
       <nixpkgs/nixos/modules/profiles/all-hardware.nix>
@@ -123,8 +127,8 @@ in {
     installPhase = ''
       mkdir $out
       ln -s ${config.system.build.g5k-image-info} $out/g5k-image-info.json
-      ln -s ${config.system.build.kadeploy_env_description} $out/kaenv.yaml
-      ln -s ${config.system.build.g5k-image} $out/${image_name}.tar.xz
+      ln -s ${config.system.build.kadeploy_env_description} $out/${image_name}.yaml
+      ln -s ${config.system.build.g5k-image}/tarball/${image_name}.tar.xz $out/${image_name}.tar.xz
     '';
   };
 
@@ -143,9 +147,9 @@ in {
   '';
 
   system.build.kadeploy_env_description = pkgs.writeTextFile {
-    name = "kaenv.yaml";
+    name = "${image_name}.yaml";
     text = ''
-      name: ${kaenv_name}
+      name: ${image_name}
       version: 1
       description: NixOS 
       author: ${author}
@@ -153,17 +157,17 @@ in {
       destructive: false
       os: linux
       image:
-        file: http://public.grenoble.grid5000.fr/~orichard/nixos-system-x86_64-linux-debug.tar.xz
+        file: ${file_image_baseurl}/${image_name}.tar.xz
         kind: tar
         compression: xz
       postinstalls:
       - archive: ${postinstall}
         compression: gzip
-        script: g5k-postinstall --debug --net none 
+        script:  ${postinstall_args}
       boot:
         kernel: /boot/bzImage 
         initrd: /boot/initrd
-        kernel_params: init=boot/init console=tty0 console=ttyS0,115200 debugtrace 
+        kernel_params: init=boot/init console=tty0 console=ttyS0,115200
       filesystem: ext4
       partition_type: 131
       multipart: false
