@@ -1,40 +1,39 @@
 { config, lib, pkgs, modulesPath, ... }:
 let
   image_name = if (builtins.getEnv ("KAENV_NAME") != "") then
-  builtins.getEnv ("KAENV_NAME")
+    builtins.getEnv ("KAENV_NAME")
   else
-  "nixos-${pkgs.stdenv.hostPlatform.system}";
+    "nixos-${pkgs.stdenv.hostPlatform.system}";
 
   author = if (builtins.getEnv ("AUTHOR") != "") then
     builtins.getEnv ("AUTHOR")
   else
-  builtins.getEnv ("USER");
+    builtins.getEnv ("USER");
 
- file_image_baseurl = if (builtins.getEnv ("FILE_IMAGE_BASEURL") != "") then
+  file_image_baseurl = if (builtins.getEnv ("FILE_IMAGE_BASEURL") != "") then
     builtins.getEnv ("FILE_IMAGE_BASEURL")
   else
     "file:~";
 
- postinstall = if (builtins.getEnv ("POST_INSTALL") != "") then
-  builtins.getEnv ("POST_INSTALL")
+  postinstall = if (builtins.getEnv ("POST_INSTALL") != "") then
+    builtins.getEnv ("POST_INSTALL")
   else
-  "http://public.nancy.grid5000.fr/~orichard/postinstalls/g5k-nixos-postinstall-2020111201.tgz";
+    "http://public.nancy.grid5000.fr/~orichard/postinstalls/g5k-nixos-postinstall-2020111201.tgz";
 
- postinstall_args = if (builtins.getEnv ("POST_INSTALL") != "") then
-   builtins.getEnv ("POST_INSTALL_ARGS")
-   else
-   "g5k-postinstall --net none --disable-install-grub2";
-   
+  postinstall_args = if (builtins.getEnv ("POST_INSTALL") != "") then
+    builtins.getEnv ("POST_INSTALL_ARGS")
+  else
+    "g5k-postinstall --net none --disable-install-grub2";
+
 in {
 
-  imports =
-    [
-      # Profiles of this basic installation.
-      <nixpkgs/nixos/modules/profiles/all-hardware.nix>
-      <nixpkgs/nixos/modules/profiles/base.nix>
-      <nixpkgs/nixos/modules/profiles/installation-device.nix>
-      <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
-    ];
+  imports = [
+    # Profiles of this basic installation.
+    <nixpkgs/nixos/modules/profiles/all-hardware.nix>
+    <nixpkgs/nixos/modules/profiles/base.nix>
+    <nixpkgs/nixos/modules/profiles/installation-device.nix>
+    <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
+  ];
 
   # Set and select root system by label (nixos) 
   boot.initrd.extraUtilsCommands = ''
