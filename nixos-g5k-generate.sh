@@ -1,10 +1,6 @@
 #!/usr/bin/env nix-shell
 #! nix-shell -i bash 
 
-
-# ./nixos-g5k-generate.sh -c configuration.nix -b http://public.grenoble.grid5000.fr/~orichard
-
-
 set -euo pipefail
 
 readonly libexec_dir="${0%/*}"
@@ -29,21 +25,18 @@ Usage: $0 [options]
 
 Options:
 
-* --help: shows this help
-* -c, --configuration PATH:
-    select the nixos configuration to build. Default: $configuration
+* -h, --help: shows this help
+* -c, --configuration PATH: select the nixos configuration to build. Default: configuration.nix
 * -o, --out-link: specify the outlink location for nix-build
-* --run-vm: generate and run on qemu the correspondant vm-image (NOT YET IMPLEMENTED)
-* --system: specify the target system (eg: x86_64-linux, aarch64-linux), by default it is the same of building platform.
-* -I KEY=VALUE: add a key to the Nix expression search path (ex: -I nixpkgs=channel:nixos-20.09).
+* --run-vm: generate and run on qemu the correspondant vm-image (WIP)
+* --system: specify the target system (eg: x86_64-linux, aarch64-linux), by default it is the same as the building platform.
+* -I KEY=VALUE: add a key to the Nix expression search path (eg: -I nixpkgs=channel:nixos-20.09).
 * -d, --destination-image-path PATH: destination path to copy resultin image archive (no copy by default)
- (NOT YET IMPLEMENTED) 
 * -n, --name: environment name
-* -b, file-image-baseurl: file baseurl for env descripion (ex http://public.grenoble.grid5000.fr/~fnietzsche)
+* -u, file-image-baseurl: file baseurl for env description (eg: http://public.grenoble.grid5000.fr/~fnietzsche)
 
 example:
-    ./nixos-g5k-generate.sh -c configuration.nix -u http://public.grenoble.grid5000.fr/~orichard -I nixpkgs=channel:nixos-20.09
-
+    ./nixos-g5k-generate.sh -c configuration.nix -u http://public.grenoble.grid5000.fr/~orichard -I nixpkgs=channel:nixos-20.09 -d ~/public -n test
 
 USAGE
 }
@@ -55,8 +48,8 @@ abort() {
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --help)
-            show_Usage
+        -h | --help)
+            show_usage
             exit
             ;;
         -c | --configuration)
@@ -121,7 +114,11 @@ else
    echo $nixos_generate
    $nixos_generate
 
+   echo "Built files in $outlink:"
+   ls $outlink
+
    if [[ -n $destination_image_path ]]; then
+       echo "Copy image archive and description files into $destination_image_path"
        cp $outlink/*.tar.xz $outlink/*.yaml $destination_image_path/
    fi
 fi
