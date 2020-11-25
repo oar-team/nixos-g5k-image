@@ -26,7 +26,6 @@ let
     "g5k-postinstall --net none --disable-install-grub2";
 
 in {
-
   imports = [
     # Profiles of this basic installation.
     <nixpkgs/nixos/modules/profiles/all-hardware.nix>
@@ -34,6 +33,12 @@ in {
     <nixpkgs/nixos/modules/profiles/installation-device.nix>
     <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
   ];
+
+  # base configuration
+  services.sshd.enable = true;
+  networking.firewall.enable = false;
+  services.openssh.permitRootLogin = lib.mkDefault "yes";
+  services.mingetty.autologinUser = lib.mkDefault "root";
 
   # Set and select root system by label (nixos) 
   boot.initrd.extraUtilsCommands = ''
@@ -114,7 +119,7 @@ in {
       init = "${
           builtins.unsafeDiscardStringContext config.system.build.toplevel
         }/init";
-      image = config.system.build.g5k-image;
+      image = "${config.system.build.g5k-image}/tarball/${image_name}.tar.xz";
       kaenv = config.system.build.kadeploy_env_description;
     });
 
@@ -177,5 +182,4 @@ in {
   formatAttr = "g5k-image-all";
   #formatAttr = "g5k-image";
   #formatAttr = "g5k-image-info";
-  filename = "*.img";
 }
