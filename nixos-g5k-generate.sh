@@ -42,8 +42,8 @@ USAGE
 }
 
 abort() {
-  echo "aborted: $*" >&2
-  exit 1
+    echo "aborted: $*" >&2
+    exit 1
 }
 
 while [[ $# -gt 0 ]]; do
@@ -93,7 +93,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -n $target_system ]]; then
-  nixos_generate_args+=(--system "$target_system")
+    nixos_generate_args+=(--system "$target_system")
 fi
 
 if [[ -n $name ]]; then
@@ -105,21 +105,21 @@ if [[ -n $file_image_baseurl ]]; then
 fi 
 
 if [[ -n $run_vm ]]; then
-   nixos_generate="nixos-generate -c $configuration  --cores 4 ${nixos_generate_args[@]} --run"
-   echo $nixos_generate
-   $nixos_generate
+    nixos_generate="nixos-generate -c $configuration  --cores 4 ${nixos_generate_args[@]} --run"
+    echo $nixos_generate
+    $nixos_generate
 else
-   nixos_generate_args+=(-o $outlink)
-   nixos_generate="nixos-generate -c $configuration --cores 4 ${nixos_generate_args[@]} --format-path $format_path" 
-   echo $nixos_generate
-   $nixos_generate
-
-   echo "Built files in $outlink:"
-   ls $outlink
-
-   if [[ -n $destination_image_path ]]; then
-       echo "Copy image archive and description files into $destination_image_path"
-       cp $outlink/*.tar.xz $outlink/*.yaml $destination_image_path/
-   fi
+    nixos_generate_args+=(-o $outlink)
+    nixos_generate="nixos-generate -c $configuration --cores 4 ${nixos_generate_args[@]} --format-path $format_path" 
+    echo $nixos_generate
+    $nixos_generate
+    
+    echo "Built files in $outlink:"
+    ls $outlink
+    
+    if [[ -n $destination_image_path ]]; then
+        echo "Copy image archive and description files into $destination_image_path"
+        cp $outlink/*.tar.xz $outlink/*.yaml $destination_image_path/
+    fi
 fi
 

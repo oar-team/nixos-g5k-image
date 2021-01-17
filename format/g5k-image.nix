@@ -18,12 +18,12 @@ let
   postinstall = if (builtins.getEnv ("POST_INSTALL") != "") then
     builtins.getEnv ("POST_INSTALL")
   else
-    "http://public.nancy.grid5000.fr/~orichard/postinstalls/g5k-nixos-postinstall-2020111201.tgz";
+    "server:///grid5000/postinstalls/g5k-postinstall.tgz";
 
   postinstall_args = if (builtins.getEnv ("POST_INSTALL") != "") then
     builtins.getEnv ("POST_INSTALL_ARGS")
   else
-    "g5k-postinstall --net none --disable-install-grub2";
+    "g5k-postinstall --net none --bootloader no-grub-from-deployed-env";
 
 in {
   imports = [
