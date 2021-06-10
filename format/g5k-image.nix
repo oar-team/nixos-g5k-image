@@ -38,7 +38,7 @@ in {
   services.sshd.enable = true;
   networking.firewall.enable = false;
   services.openssh.permitRootLogin = lib.mkDefault "yes";
-  services.mingetty.autologinUser = lib.mkDefault "root";
+  services.getty.autologinUser = lib.mkDefault "root";
 
   # Set and select root system by label (nixos) 
   boot.initrd.extraUtilsCommands = ''
@@ -49,9 +49,9 @@ in {
     for o in $(cat /proc/cmdline); do
     case $o in
             root=*)
-                set -- $(IFS==; echo $o)
-                waitDevice $2
-                e2label $2 nixos
+                disk_uuid=/dev/disk/by-uuid/$(echo $o | cut -c11-)
+                waitDevice $disk_uuid
+                e2label $disk_uuid nixos
                 ;;
         esac
     done
