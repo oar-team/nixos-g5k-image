@@ -30,17 +30,19 @@ To generate an image archive and its associated kadeploy environment description
 ```console
 # commands are launched on a Grid'5000' node
 SITE=$(hostname -d | cut -d'.' -f1)
-./nixos-g5k-generate.sh -c configuration.nix -u http://public.$SITE.grid5000.fr/~orichard -I nixpkgs=channel:nixos-20.09 -d ~/public -n nixos-test
+./nixos-g5k-generate.sh -c configuration.nix -u http://public.$SITE.grid5000.fr/~$USER \
+-I nixpkgs=channel:nixos-21.05 -d ~/public -n nixos-test
 ```
 
 To deploy on Grid'5000 nodes: 
 ```console
 SITE=$(hostname -d | cut -d'.' -f1)
- kadeploy3 -f $OAR_NODEFILE -a http://public.$SITE.grid5000.fr/~orichard/nixos-test.yaml -k
+ kadeploy3 -f $OAR_NODEFILE -a http://public.$SITE.grid5000.fr/~$USER/nixos-test.yaml -k
 ```
 
 Variant generation with pinning (i.e. for reproducibiliy with fixed version)
 
 ```console
-./nixos-g5k-generate.sh -c configuration.nix -n test-nixos -u http://public.grenoble.grid5000.fr/~orichard -I nixpkgs=https://github.com/nixos/nixpkgs/archive/cd63096d6d887d689543a0b97743d28995bc9bc3.tar.gz -d ~/public
+./nixos-g5k-generate.sh -c configuration.nix -n nixos-test -u http://public.grenoble.grid5000.fr/~$USER \
+-I nixpkgs=https://github.com/nixos/nixpkgs/archive/7e9b0dff974c89e070da1ad85713ff3c20b0ca97.tar.gz -d ~/public
 ```
