@@ -18,7 +18,8 @@ let
   postinstall = if (builtins.getEnv ("POST_INSTALL") != "") then
     builtins.getEnv ("POST_INSTALL")
   else
-    "server:///grid5000/postinstalls/g5k-postinstall.tgz";
+    #"server:///grid5000/postinstalls/g5k-postinstall.tgz";
+    "http://public.grenoble.grid5000.fr/~orichard/postinstalls/g5k-postinstall";
 
   postinstall_args = if (builtins.getEnv ("POST_INSTALL") != "") then
     builtins.getEnv ("POST_INSTALL_ARGS")
@@ -40,34 +41,18 @@ in {
   services.openssh.permitRootLogin = lib.mkDefault "yes";
   services.getty.autologinUser = lib.mkDefault "root";
 
-  # Set and select root system by label (nixos) 
-  boot.initrd.extraUtilsCommands = ''
-    copy_bin_and_libs ${pkgs.e2fsprogs}/bin/e2label
-  '';
-
-  boot.initrd.postDeviceCommands = ''
-    for o in $(cat /proc/cmdline); do
-    case $o in
-            root=*)
-                disk_uuid=/dev/disk/by-uuid/$(echo $o | cut -c11-)
-                waitDevice $disk_uuid
-                e2label $disk_uuid nixos
-                ;;
-        esac
-    done
-  '';
-
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
-  boot.loader.grub.device = "/dev/sda3";
-
+  boot.loader.grub.device = "/dev/root";
+  
   boot.initrd.availableKernelModules =
     [ "ahci" "ehci_pci" "megaraid_sas" "sd_mod" ];
   boot.kernelModules = [ "kvm-intel" ];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-label/nixos";
+    #device = "/dev/disk/by-label/nixos";
+    device = "/dev/root";
     autoResize = true;
     fsType = "ext4";
   };
